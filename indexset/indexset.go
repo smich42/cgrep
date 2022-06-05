@@ -83,7 +83,6 @@ func (is IndexSet[T]) Has(element indexable) bool {
 // The number of elements currently stored in the set.
 func (is IndexSet[T]) Count() int {
 	count := 0
-
 	for _, word := range is.words {
 		count += bits.OnesCount64(word)
 	}
@@ -94,6 +93,49 @@ func (is IndexSet[T]) Count() int {
 // The number of elements the set can store.
 func (is IndexSet[T]) Capacity() int {
 	return wordSize * len(is.words)
+}
+
+// Returns a new IndexSet which is the union of two given sets.
+func Union[T indexable](a, b *IndexSet[T]) *IndexSet[T] {
+	// The capacity of the new IndexSet will be that of the largest of the two sets.
+	jointCapacity := int(math.Max(
+		float64(a.Capacity()),
+		float64(b.Capacity())))
+
+	c := New[T](jointCapacity)
+
+	for i := 0; i < len(c.words); i++ {
+		var wordA, wordB uint64 = 0, 0
+
+		if i < len(a.words) {
+			wordA = a.words[i]
+		}
+		if i < len(b.words) {
+			wordB = b.words[i]
+		}
+
+		// Any bits that are 1 in either constituent set will be 1 in the result.
+		c.words[i] = wordA | wordB
+	}
+
+	return c
+}
+
+// Returns a new IndexSet which is the intersection of two given sets.
+func Intersection[T indexable](a, b *IndexSet[T]) *IndexSet[T] {
+	// The capacity of the new IndexSet will be that of the smallest of the two sets.
+	jointCapacity := int(math.Min(
+		float64(a.Capacity()),
+		float64(b.Capacity())))
+
+	c := New[T](jointCapacity)
+
+	for i := 0; i < len(c.words); i++ {
+		// Only bits that are 1 in both constituent sets will be 1 in the result.
+		c.words[i] = a.words[i] & b.words[i]
+	}
+
+	return c
 }
 
 // Ensures the given element can be stored in the set.

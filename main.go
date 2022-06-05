@@ -10,6 +10,7 @@ func main() {
 	fmt.Println("Hello, World!")
 
 	is := indexset.New[natural](1000)
+	is2 := indexset.New[natural](1000)
 
 	fmt.Println(is.Count())
 
@@ -21,6 +22,12 @@ func main() {
 	is.Place(natural{501})
 	is.Place(natural{500})
 	is.Place(natural{999})
+
+	is2.Place(natural{0})
+	is2.Place(natural{1})
+	is2.Place(natural{501})
+	is2.Place(natural{500})
+	is2.Place(natural{998})
 
 	fmt.Println(is.Count())
 
@@ -35,6 +42,13 @@ func main() {
 	for _, n := range []int{0, 1, 2, 3, 500, 501, 998, 999, 1000} {
 		fmt.Println(n, is.Has(natural{n}))
 	}
+
+	union := indexset.Intersection(is, is2)
+
+	for _, n := range []int{0, 1, 2, 3, 500, 501, 998, 999, 1000} {
+		fmt.Println(n, union.Has(natural{n}))
+	}
+
 }
 
 type natural struct {
