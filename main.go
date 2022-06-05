@@ -11,6 +11,8 @@ func main() {
 
 	is := indexset.New[natural](1000)
 
+	fmt.Println(is.Count())
+
 	is.Place(natural{0})
 	is.Place(natural{1})
 	is.Place(natural{2})
@@ -20,8 +22,12 @@ func main() {
 	is.Place(natural{500})
 	is.Place(natural{999})
 
+	fmt.Println(is.Count())
+
 	is.Remove(natural{500})
 	is.Remove(natural{1000})
+
+	fmt.Println(is.Count())
 
 	is.Remove(natural{998})
 	is.Place(natural{998})
