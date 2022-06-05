@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math"
 	"math/bits"
+	"strconv"
+	"strings"
 )
 
 // Types storable in an IndexSet must implement an indexing function.
@@ -73,11 +75,7 @@ func (is IndexSet[T]) Has(element indexable) bool {
 	}
 
 	word := is.wordOf(element)
-	toggledBit := uint64(1) << is.wordPositionOf(element)
-
-	// AND between the word and a number whose i^th bit is the only one toggled
-	// does not produce 0 IFF the i^th bit of the word is activated.
-	return ((*word) & toggledBit) != uint64(0)
+	return toggled(is.wordPositionOf(element), *word)
 }
 
 // The number of elements currently stored in the set.
@@ -93,6 +91,21 @@ func (is IndexSet[T]) Count() int {
 // The number of elements the set can store.
 func (is IndexSet[T]) Capacity() int {
 	return wordSize * len(is.words)
+}
+
+// Builts a pretty string of for the indices in the set.
+func (is IndexSet[T]) String() string {
+	indices := []string{}
+
+	for i := 0; i < len(is.words); i++ {
+		for j := 0; j < wordSize; j++ {
+			if toggled(uint(j), is.words[i]) {
+				indices = append(indices, strconv.Itoa(i*wordSize+j))
+			}
+		}
+	}
+
+	return "{" + strings.Join(indices, ", ") + "}"
 }
 
 // Returns a new IndexSet which is the union of two given sets.
@@ -158,4 +171,12 @@ func (is IndexSet[T]) wordOf(element indexable) *uint64 {
 // start of the word it belongs to.
 func (is IndexSet[T]) wordPositionOf(element indexable) uint {
 	return element.Idx() % wordSize
+}
+
+// Checks whether a given bit in a word is 1.
+func toggled(bitpos uint, word uint64) bool {
+	toggledBit := uint64(1) << bitpos
+	// AND between the word and a number whose i^th bit is the only one toggled
+	// does not produce 0 IFF the i^th bit of the word is activated.
+	return (word & toggledBit) != uint64(0)
 }

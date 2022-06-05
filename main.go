@@ -7,48 +7,37 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, World!")
+	a := indexset.New[natural](1000)
+	b := indexset.New[natural](1000)
 
-	is := indexset.New[natural](1000)
-	is2 := indexset.New[natural](1000)
+	a.Place(natural{0})
+	a.Place(natural{1})
+	a.Place(natural{2})
+	a.Place(natural{4})
+	a.Place(natural{8})
+	a.Place(natural{501})
+	a.Place(natural{500})
+	a.Place(natural{999})
 
-	fmt.Println(is.Count())
+	b.Place(natural{0})
+	b.Place(natural{1})
+	b.Place(natural{501})
+	b.Place(natural{500})
+	b.Place(natural{998})
 
-	is.Place(natural{0})
-	is.Place(natural{1})
-	is.Place(natural{2})
-	is.Place(natural{4})
-	is.Place(natural{8})
-	is.Place(natural{501})
-	is.Place(natural{500})
-	is.Place(natural{999})
+	a.Remove(natural{500})
+	a.Remove(natural{1000})
 
-	is2.Place(natural{0})
-	is2.Place(natural{1})
-	is2.Place(natural{501})
-	is2.Place(natural{500})
-	is2.Place(natural{998})
+	a.Remove(natural{998})
+	a.Place(natural{998})
 
-	fmt.Println(is.Count())
+	union := indexset.Union(a, b)
+	intersection := indexset.Intersection(a, b)
 
-	is.Remove(natural{500})
-	is.Remove(natural{1000})
-
-	fmt.Println(is.Count())
-
-	is.Remove(natural{998})
-	is.Place(natural{998})
-
-	for _, n := range []int{0, 1, 2, 3, 500, 501, 998, 999, 1000} {
-		fmt.Println(n, is.Has(natural{n}))
-	}
-
-	union := indexset.Intersection(is, is2)
-
-	for _, n := range []int{0, 1, 2, 3, 500, 501, 998, 999, 1000} {
-		fmt.Println(n, union.Has(natural{n}))
-	}
-
+	fmt.Println(a.String())
+	fmt.Println(b.String())
+	fmt.Println(union.String())
+	fmt.Println(intersection.String())
 }
 
 type natural struct {
