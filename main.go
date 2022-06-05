@@ -10,25 +10,10 @@ func main() {
 	a := indexset.New[natural](1000)
 	b := indexset.New[natural](1000)
 
-	a.Place(natural{0})
-	a.Place(natural{1})
-	a.Place(natural{2})
-	a.Place(natural{4})
-	a.Place(natural{8})
-	a.Place(natural{501})
-	a.Place(natural{500})
-	a.Place(natural{999})
+	a.PlaceAll(natural{0}, natural{1}, natural{2}, natural{4}, natural{8}, natural{501}, natural{500}, natural{999})
+	b.PlaceAll(natural{1}, natural{3}, natural{501}, natural{500}, natural{998})
 
-	b.Place(natural{0})
-	b.Place(natural{1})
-	b.Place(natural{501})
-	b.Place(natural{500})
-	b.Place(natural{998})
-
-	a.Remove(natural{500})
-	a.Remove(natural{1000})
-
-	a.Remove(natural{998})
+	a.RemoveAll(natural{500}, natural{998}, natural{1000})
 	a.Place(natural{998})
 
 	union := indexset.Union(a, b)

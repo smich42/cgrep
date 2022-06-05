@@ -53,6 +53,13 @@ func (is IndexSet[T]) Place(element indexable) {
 	*word |= toggledBit
 }
 
+// Adds all given elements to the set.
+func (is IndexSet[T]) PlaceAll(elements ...indexable) {
+	for _, element := range elements {
+		is.Place(element)
+	}
+}
+
 // Removes a new element to the set.
 func (is IndexSet[T]) Remove(element indexable) {
 	if !is.validate(element) {
@@ -68,6 +75,13 @@ func (is IndexSet[T]) Remove(element indexable) {
 	*word &= untoggledBit
 }
 
+// Removes all given elements from the set.
+func (is IndexSet[T]) RemoveAll(elements ...indexable) {
+	for _, element := range elements {
+		is.Remove(element)
+	}
+}
+
 // Checks whether the set contains a given element.
 func (is IndexSet[T]) Has(element indexable) bool {
 	if !is.validate(element) {
@@ -76,6 +90,26 @@ func (is IndexSet[T]) Has(element indexable) bool {
 
 	word := is.wordOf(element)
 	return toggled(is.wordPositionOf(element), *word)
+}
+
+// Checks whether the set contains all given elements.
+func (is IndexSet[T]) HasAll(elements ...indexable) bool {
+	for _, element := range elements {
+		if !is.Has(element) {
+			return false
+		}
+	}
+	return true
+}
+
+// Checks whether the set contains any of the given elements.
+func (is IndexSet[T]) HasAny(elements ...indexable) bool {
+	for _, element := range elements {
+		if is.Has(element) {
+			return true
+		}
+	}
+	return false
 }
 
 // The number of elements currently stored in the set.
