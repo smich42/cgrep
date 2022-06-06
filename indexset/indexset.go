@@ -60,7 +60,7 @@ func (is IndexSet[T]) PlaceAll(elements ...indexable) {
 	}
 }
 
-// Removes a new element to the set.
+// Removes a new element from the set.
 func (is IndexSet[T]) Remove(element indexable) {
 	if !is.validate(element) {
 		panic(is.outOfRangeError(element))
