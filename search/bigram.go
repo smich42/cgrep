@@ -6,38 +6,41 @@ import (
 	"strings"
 )
 
-type Bigram struct {
+type bigram struct {
 	a, b rune
 }
 
 // Computes the index of a bigram.
 // Each bigram is assigned a unique index starting from 0 in the following order.
 // '  ', ' a', ' b', ..., 'a ', 'aa','ab', ..., 'zz'
-func (bg Bigram) Idx() uint {
+func (bg bigram) Idx() uint {
 	return uint(magn(bg.a)*('z'-'a') + magn(bg.b))
 }
 
-// Creates a new bigram from the given two-letter string.
-func New(ab string) *Bigram {
-	bg := Bigram{}
-	// Ensure string is a bigram.
-	if len(ab) != 2 {
-		panic(fmt.Errorf("invalid bigram length [%d], required: 2", len(ab)))
-	}
+func FirstBigram() bigram {
+	return *newBigram(' ', ' ')
+}
 
-	a, b := rune(ab[0]), rune(ab[1])
+func LastBigram() bigram {
+	return *newBigram('z', 'z')
+}
+
+// Creates a new bigram from the given two-letter string.
+func newBigram(a, b rune) *bigram {
+	bg := bigram{}
+
 	// Ensure bigram contains only lowercase characters and spaces.
 	if validate(a) && validate(b) {
 		bg.a, bg.b = a, b
 	} else {
-		panic(fmt.Errorf("invalid character in bigram '%s'", ab))
+		panic(fmt.Errorf("invalid character in bigram '%c%c'", a, b))
 	}
 
 	return &bg
 }
 
 // Sanitises the given string so that only bigram-compliant characters remain.
-func Clean(text string) string {
+func clean(text string) string {
 	sanitised := strings.Builder{}
 
 	for _, c := range strings.ToLower(text) {

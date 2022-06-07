@@ -24,7 +24,7 @@ const wordSize = 64
 
 // Constructs a new IndexSet with a given minimum capacity.
 // In reality the capacity will be an integer multiple of wordSize.
-func New[T indexable](capacity int) *IndexSet[T] {
+func NewIndexSet[T indexable](capacity int) *IndexSet[T] {
 	if capacity <= 0 {
 		panic(fmt.Errorf("invalid capacity %d: set must be able to hold at least 1 element", capacity))
 	}
@@ -149,7 +149,7 @@ func Union[T indexable](a, b *IndexSet[T]) *IndexSet[T] {
 		float64(a.Capacity()),
 		float64(b.Capacity())))
 
-	c := New[T](jointCapacity)
+	c := NewIndexSet[T](jointCapacity)
 
 	for i := 0; i < len(c.words); i++ {
 		var wordA, wordB uint64 = 0, 0
@@ -175,7 +175,7 @@ func Intersection[T indexable](a, b *IndexSet[T]) *IndexSet[T] {
 		float64(a.Capacity()),
 		float64(b.Capacity())))
 
-	c := New[T](jointCapacity)
+	c := NewIndexSet[T](jointCapacity)
 
 	for i := 0; i < len(c.words); i++ {
 		// Only bits that are 1 in both constituent sets will be 1 in the result.
@@ -183,6 +183,18 @@ func Intersection[T indexable](a, b *IndexSet[T]) *IndexSet[T] {
 	}
 
 	return c
+}
+
+// Computes the Jaccard similarity of two sets.
+func Jaccard[T indexable](a, b *IndexSet[T]) float32 {
+	intersection := Intersection(a, b).Count()
+	union := Union(a, b).Count()
+
+	if union == 0 {
+		return 1.0 // Empty sets are identical
+	}
+
+	return float32(intersection) / float32(union)
 }
 
 // Ensures the given element can be stored in the set.
