@@ -7,7 +7,11 @@ import (
 )
 
 func main() {
-	for _, match := range *search.Match("hello, aworld!", "hello world this is em speaking", 0.75) {
-		fmt.Printf("'%s'\n", match)
+	results, _ := search.SearchDir("quick brown fox", ".", 0.5)
+	for filepath, matches := range *results {
+		fmt.Println(filepath)
+		for _, match := range *matches {
+			fmt.Println("\t" + match)
+		}
 	}
 }
