@@ -8,7 +8,7 @@ import (
 
 // Produces all matches in the haystack whose similarity to the needle
 // is over the given threshold.
-func Match(needle, haystack string, threshold float32) *[]string {
+func match(needle, haystack string, threshold float32) *[]string {
 	haystack = clean(haystack)
 	needle = clean(needle)
 
@@ -18,7 +18,7 @@ func Match(needle, haystack string, threshold float32) *[]string {
 
 	matches := []string{}
 
-	for i := 0; i < len(words)-wordCount; i++ {
+	for i := 0; i <= len(words)-wordCount; i++ {
 		// Produce the next sentence with the same word count as the search pattern.
 		candidate := words[i]
 		for j := 1; j < wordCount; j++ {
@@ -42,7 +42,7 @@ func similarity(a, b string) float32 {
 func bigramsOf(s string) *indexset.IndexSet[bigram] {
 	// Bigrams range from '  ' (index 0) to 'zz' (index 26*26).
 	// The IndexSet must accommodate them all.
-	possibleBigrams := int(LastBigram().Idx())
+	possibleBigrams := int(lastBigram().Idx())
 	bigrams := indexset.NewIndexSet[bigram](possibleBigrams)
 
 	for i := 0; i < len(s)-1; i++ {

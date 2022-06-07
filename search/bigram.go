@@ -17,11 +17,13 @@ func (bg bigram) Idx() uint {
 	return uint(magn(bg.a)*('z'-'a') + magn(bg.b))
 }
 
-func FirstBigram() bigram {
+// Returns the bigram with index 0.
+func firstBigram() bigram {
 	return *newBigram(' ', ' ')
 }
 
-func LastBigram() bigram {
+// Returns the bigram with maximum index.
+func lastBigram() bigram {
 	return *newBigram('z', 'z')
 }
 
