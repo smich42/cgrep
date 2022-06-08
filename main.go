@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	results, _ := search.SearchDir("quick brown fox", ".", 0.5)
+	results, _ := search.SearchDir("quick brown fox", "testdata/", 0.5)
 	for filepath, matches := range *results {
 		fmt.Println(filepath)
 		for _, match := range *matches {

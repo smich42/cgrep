@@ -4,8 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
+
+type filematches struct {
+	filepath string
+	matches  *[]string
+}
 
 // Searches all first-level files in a directory for approximate matches above the given threshold.
 func SearchDir(needle string, dirpath string, threshold float32) (*map[string]*[]string, error) {
@@ -29,32 +35,44 @@ func SearchDir(needle string, dirpath string, threshold float32) (*map[string]*[
 		return nil, direrr
 	}
 
-	filesToMatches := make(map[string]*[]string)
+	resultChan := make(chan filematches)
+	resultCount := 0
+
 	// Map each file to a slice of matches.
 	for _, entry := range filelist {
 		// Avoid searching subdirectories.
 		// First-level search only.
 		if !entry.IsDir() {
-			filepath := dirpath + string(os.PathSeparator) + entry.Name()
+			filepath := filepath.Join(dirpath, entry.Name())
 
-			matches, matcherr := SearchFile(needle, filepath, threshold)
-			if matcherr == nil {
-				filesToMatches[filepath] = matches
-			}
+			go searchFile(needle, filepath, threshold, resultChan)
+			resultCount++
 		}
 	}
 
-	return &filesToMatches, nil
+	results := make(map[string]*[]string)
+	// Receive result for each file that is searched.
+	for i := 0; i < resultCount; i++ {
+		result := <-resultChan
+		results[result.filepath] = result.matches
+	}
+
+	close(resultChan)
+	return &results, nil
 }
 
 // Searches file for approximate matches above the given threshold.
-func SearchFile(needle string, filepath string, threshold float32) (*[]string, error) {
+func searchFile(needle string, filepath string, threshold float32, c chan filematches) {
 	contents, err := readFile(filepath)
-	if err != nil {
-		return nil, err
-	}
 
-	return match(needle, contents, threshold), nil
+	if err != nil {
+		c <- filematches{filepath: filepath, matches: nil}
+	} else {
+		c <- filematches{
+			filepath: filepath,
+			matches:  match(needle, contents, threshold),
+		}
+	}
 }
 
 // Returns a string containing all text in the given file.
