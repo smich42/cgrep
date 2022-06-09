@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-type filematches struct {
+type searchResult struct {
 	filepath string
 	matches  *[]string
 }
@@ -30,12 +30,11 @@ func SearchDir(needle string, dirpath string, threshold float32) (*map[string]*[
 	}
 
 	filelist, direrr := dir.ReadDir(0)
-
 	if direrr != nil {
 		return nil, direrr
 	}
 
-	resultChan := make(chan filematches)
+	resultChan := make(chan searchResult)
 	resultCount := 0
 
 	// Map each file to a slice of matches.
@@ -62,13 +61,13 @@ func SearchDir(needle string, dirpath string, threshold float32) (*map[string]*[
 }
 
 // Searches file for approximate matches above the given threshold.
-func searchFile(needle string, filepath string, threshold float32, c chan filematches) {
+func searchFile(needle string, filepath string, threshold float32, c chan searchResult) {
 	contents, err := readFile(filepath)
 
 	if err != nil {
-		c <- filematches{filepath: filepath, matches: nil}
+		c <- searchResult{filepath: filepath, matches: nil}
 	} else {
-		c <- filematches{
+		c <- searchResult{
 			filepath: filepath,
 			matches:  match(needle, contents, threshold),
 		}
@@ -89,7 +88,7 @@ func readFile(filepath string) (string, error) {
 	}
 
 	if finfo.IsDir() {
-		return "", fmt.Errorf("file may not be a directory")
+		return "", fmt.Errorf("file cannot be a directory")
 	}
 
 	input := bufio.NewScanner(f)
